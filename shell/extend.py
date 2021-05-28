@@ -44,7 +44,5 @@ def change_bed(bed,out,value):
 if __name__ == "__main__":
 	
 	args = getparser()
-
 	bed = args.bed	
-	
 	change_bed(bed,args.out,args.inter)	

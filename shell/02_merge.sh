@@ -1,35 +1,51 @@
+#!/usr/bin/shell
 
-## step_1 set extend bed files with window size 
-for i in `ls /data/BCI-Haemato/Yi/change_bed/03.short/`;do
-	python extend.py -b /data/BCI-Haemato/Yi/change_bed/03.short/$i -o /data/BCI-Haemato/Yi/change_bed/04.merge/$i -int 750
-done
+window_size=$1
+wkdir=$2
 
+if [ -z $window_size ];then
 
-## step_2 merge three bed files to merged.bed 
-module load bedtools
-mkdir /data/BCI-Haemato/Yi/change_bed/04.merge/extend
-mv /data/BCI-Haemato/Yi/change_bed/04.merge/*bed /data/BCI-Haemato/Yi/change_bed/04.merge/extend
+	echo "please set the window size"
 
-mkdir /data/BCI-Haemato/Yi/change_bed/04.merge/merge
-cat /data/BCI-Haemato/Yi/change_bed/04.merge/extend/*bed | sort -k1,1 -k2,2n | bedtools merge -i - -c 4 -o collapse -d 100 > /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge.bed
+elif [ -z $wkdir ];then
 
+	echo "please set the working directory"
 
+else
+	
+	mkdir -p $wkdir/04.merge/$window_size
 
-# step_3 extracted intersect bed and lst
-mkdir /data/BCI-Haemato/Yi/change_bed/04.merge/lst
-
-bedtools intersect -a /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge.bed -b /data/BCI-Haemato/Yi/change_bed/04.merge/extend/200k_eRNA_loci.bed -wa -u > /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge_200k.bed
-
-bedtools intersect -a /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge.bed -b /data/BCI-Haemato/Yi/change_bed/04.merge/extend/Annotation_eRNA_300k_enhancer.bed -wa -u > /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge_300k.bed 
-
-bedtools intersect -a /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge.bed -b /data/BCI-Haemato/Yi/change_bed/04.merge/extend/F03_63000_enhancer.bed -wa -u > /data/BCI-Haemato/Yi/change_bed/04.merge/merge/merge_63k.bed
+	## step_1 set extend bed files with window size 
+	for i in `ls $wkdir/03.short/`;do
+		python extend.py -b $wkdir/03.short/$i -o $wkdir/04.merge/$window_size/$i -int $window_size
+	done
 
 
-# step_4 create merge list
-for i in `ls /data/BCI-Haemato/Yi/change_bed/04.merge/merge/`
-do 
-	a=${i%%.*}; awk 'BEGIN{print "'$a'"}{print $4}' /data/BCI-Haemato/Yi/change_bed/04.merge/merge/$i > /data/BCI-Haemato/Yi/change_bed/04.merge/lst/$a".lst"
-done
+	## step_2 merge three bed files to merged.bed 
+	module load bedtools
+	mkdir $wkdir/04.merge/$window_size/extend
+	mv $wkdir/04.merge/$window_size/*bed $wkdir/04.merge/$window_size/extend
 
-# step_5 paste all list
-paste /data/BCI-Haemato/Yi/change_bed/04.merge/lst/*lst > /data/BCI-Haemato/Yi/change_bed/04.merge/lst/63k_200k_300k.xls
+	mkdir $wkdir/04.merge/$window_size/merge
+	cat $wkdir/04.merge/$window_size/extend/*bed | sort -k1,1 -k2,2n | bedtools merge -i - -c 4 -o collapse -d 100 > $wkdir/04.merge/$window_size/merge/merge.bed
+
+
+	# step_3 extracted intersect bed and lst
+	mkdir $wkdir/04.merge/$window_size/lst
+
+	bedtools intersect -a $wkdir/04.merge/$window_size/merge/merge.bed -b $wkdir/04.merge/$window_size/extend/200k_eRNA_loci.bed -wa -u > $wkdir/04.merge/$window_size/merge/merge_200k.bed
+
+	bedtools intersect -a $wkdir/04.merge/$window_size/merge/merge.bed -b $wkdir/04.merge/$window_size/extend/Annotation_eRNA_300k_enhancer.bed -wa -u > $wkdir/04.merge/$window_size/merge/merge_300k.bed 
+
+	bedtools intersect -a $wkdir/04.merge/$window_size/merge/merge.bed -b $wkdir/04.merge/$window_size/extend/F03_63000_enhancer.bed -wa -u > $wkdir/04.merge/$window_size/merge/merge_63k.bed
+
+
+	# step_4 create merge list
+	for i in `ls $wkdir/04.merge/$window_size/merge/`
+	do 
+		a=${i%%.*}; awk 'BEGIN{print "'$a'"}{print $4}' $wkdir/04.merge/$window_size/merge/$i > $wkdir/04.merge/$window_size/lst/$a".lst"
+	done
+
+	# step_5 paste all list
+	paste $wkdir/04.merge/$window_size/lst/*lst > $wkdir/04.merge/$window_size/lst/63k_200k_300k.xls
+fi

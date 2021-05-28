@@ -22,7 +22,6 @@ def change_bed(bed,out):
 		with open(bed,"r") as f:
 			for lines in f:
 				lines = lines.rstrip()
-				
 				lst = lines.split()
 				
 				if re.match('[A-Za-z]+',lst[1]) or re.match('[A-Za-z]+',lst[2]):
@@ -43,7 +42,5 @@ def change_bed(bed,out):
 if __name__ == "__main__":
 	
 	args = getparser()
-
 	bed = args.bed	
-	
 	change_bed(bed,args.out)	

@@ -38,6 +38,6 @@ def write_cmd(cmd,out):
 		
 	
 if __name__ == '__main__':
-
+	
 	args = parser()
 	short_to_middle(args.file,args.out,args.group)
