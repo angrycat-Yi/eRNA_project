@@ -4,9 +4,15 @@ module load bedtools
 
 wkdir=$1
 
+threshold=$2
+
 if [ -z $wkdir ];then
 	
-	echo "please set working directory"
+	echo "sh filter.sh wkdir threshold"
+elif [ -z $threshold ];then
+	
+	echo "sh filter.sh wkdir threshold"
+	
 else
 
 	if [ ! -d $wkdir ];then
@@ -17,11 +23,11 @@ else
 		## step_1 create black list
 		mkdir -p $wkdir/01.blacklist/
 		cp $wkdir/data/black_list/* $wkdir/01.blacklist/
-		sed 's/chr//g' $wkdir/01.blacklist/blacklist_rmsk.txt > $wkdir/01.blacklist/blacklist_rmsk_ch.txt
-		cat $wkdir/01.blacklist/blacklist_biomart.txt $wkdir/01.blacklist/blacklist_rmsk_ch.txt  $wkdir/01.blacklist/coding.bed | sort -k1,1 -k2,2n | bedtools merge -i - -c 4 -o collapse -d 6000 > $wkdir/01.blacklist/black_list.bed
-		module load bedtools
 		
-		#bedtools getfasta -fi /data/BCI-Haemato/Yi/ref/hg38.fa -bed $wkdir/01.blacklist/black_list.bed > $wkdir/01.blacklist/black_list.fasta
+		cat $wkdir/01.blacklist/blacklist_biomart.txt $wkdir/01.blacklist/blacklist_rmsk_ch.txt  $wkdir/01.blacklist/coding.bed | sort -k1,1 -k2,2n | bedtools merge -i - -c 4 -o collapse -d $threshold > $wkdir/01.blacklist/black_list.bed
+		cp $wkdir/01.blacklist/black_list.bed $wkdir/01.blacklist/black_list_"$threshold".bed
+		module load bedtools
+		bedtools getfasta -fi /data/BCI-Haemato/Yi/ref/hg38.fa -bed $wkdir/01.blacklist/black_list.bed > $wkdir/01.blacklist/black_list_"$threshold".fasta
 
 
 		## step_2 exclude the black_list
