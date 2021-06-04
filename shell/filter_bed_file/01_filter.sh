@@ -24,10 +24,12 @@ else
 		mkdir -p $wkdir/01.blacklist/
 		cp $wkdir/data/black_list/* $wkdir/01.blacklist/
 		
+		awk '{if($1~/_/){split($1,a,"_");print a[1]"\t"$2"\t"$3"\t"$4}else{print $0}}' $wkdir/01.blacklist/blacklist_rmsk.txt|sed 's/chr//g' > $wkdir/01.blacklist/blacklist_rmsk_ch.txt
+
 		cat $wkdir/01.blacklist/blacklist_biomart.txt $wkdir/01.blacklist/blacklist_rmsk_ch.txt  $wkdir/01.blacklist/coding.bed | sort -k1,1 -k2,2n | bedtools merge -i - -c 4 -o collapse -d $threshold > $wkdir/01.blacklist/black_list.bed
 		cp $wkdir/01.blacklist/black_list.bed $wkdir/01.blacklist/black_list_"$threshold".bed
 		module load bedtools
-		bedtools getfasta -fi /data/BCI-Haemato/Yi/ref/hg38.fa -bed $wkdir/01.blacklist/black_list.bed > $wkdir/01.blacklist/black_list_"$threshold".fasta
+		#bedtools getfasta -fi /data/BCI-Haemato/Yi/ref/hg38.fa -bed $wkdir/01.blacklist/black_list.bed > $wkdir/01.blacklist/black_list_"$threshold".fasta
 
 
 		## step_2 exclude the black_list
