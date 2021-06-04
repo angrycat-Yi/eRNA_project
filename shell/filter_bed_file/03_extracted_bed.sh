@@ -25,7 +25,7 @@ else
 	cat $wkdir/05.extracted/$window_size/*lst |sort -u|awk 'FNR==NR{a[$1]=$1}NR>FNR{if(a[$4]!=""){print $0}}' - $wkdir/04.merge/$window_size/merge/merge.bed > $wkdir/05.extracted/$window_size/extracted_$window_size".bed"
 	
 	# step_5 make gff file
-	awk 'BEGIN{print "#!genome-build  GRCh38.p10\n#!genome-version\n#!genome-date   2013-12\n#!genome-build-accession\n#!genebuild-last-updated"}{print $1"\tENCODE\texon\t"$2"\t"$3"\t0\t+\t.\tgene_id=\"ENSR"$1"_"$2"\""}' $wkdir/05.extracted/$window_size/extracted_$window_size".bed" > $wkdir/05.extracted/$window_size/extracted_$window_size".gff"
+	awk 'BEGIN{print "#!genome-build  GRCh38.p10\n#!genome-version\n#!genome-date   2013-12\n#!genome-build-accession\n#!genebuild-last-updated"}{print $1"\tENCODE\texon\t"$2"\t"$3"\t0\t+\t.\tgene_id=\"ENSR"$1"_"$2"_"$3"\""}' $wkdir/05.extracted/$window_size/extracted_$window_size".bed" > $wkdir/05.extracted/$window_size/extracted_$window_size".gff"
 
 	awk '{print $1":"$2":"$3}' $wkdir/05.extracted/$window_size/extracted_$window_size".bed" > $wkdir/05.extracted/$window_size/extracted_$window_size"_check.lst"
 
